@@ -54,7 +54,7 @@
     },
     "win": {
       "icon": "assets/icon.png",
-      "category": "public.app-category.productivity"
+      "target": "portable"
     }
   }
 }
