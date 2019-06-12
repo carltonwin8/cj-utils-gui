@@ -49,11 +49,11 @@
     "copyright": "Copyright © 2019 Carlton Joseph",
     "productName": "cj-utils-gui",
     "mac": {
-      "icon": "assets/icon.icns",
+      "icon": "build/assets/icon.icns",
       "category": "public.app-category.productivity"
     },
     "win": {
-      "icon": "assets/icon.png",
+      "icon": "build/assets/icon.png",
       "target": "portable"
     }
   }
