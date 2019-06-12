@@ -12,6 +12,8 @@ Steps Followed:
 - `yarn build` then `npx electron .` show application running
 - `yarn add electron-builder --dev` and `yarn add typescript -D`
 - `npx electron-builder`
+- `yarn dist` - combines react and electron builders
+- `yarn add -D concurrently cross-env nodemon wait-on electron-is-dev`
 
 ## To Do
 
