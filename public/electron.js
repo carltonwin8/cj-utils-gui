@@ -1,8 +1,8 @@
 const path = require("path");
 const os = require("os");
 const { app, BrowserWindow } = require("electron");
-const isDev2 = require("electron-is-dev");
-const isDev = false;
+const isDev = require("electron-is-dev");
+
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true";
 const url = isDev
   ? "http://localhost:3210"
@@ -12,11 +12,19 @@ const devToolExtPathMac = path.join(
   os.homedir(),
   "/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
 );
-
 const devToolExtPathWin = path.join(
   os.homedir(),
-  "C:\Users\carlt\AppData\Local\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi\3.6.0_0"
+  "C:/Users/carlt/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
 );
+let devToolExtPath;
+switch (process.platform) {
+  case "win32":
+    devToolExtPath = devToolExtPathWin;
+    break;
+  case "darwin":
+    devToolExtPath = devToolExtPathMac;
+    break;
+}
 
 let win;
 let devToolExt;
@@ -30,7 +38,8 @@ browserWinConfig = {
 };
 
 function createWindow() {
-  devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPathWin);
+  if (devToolExtPath)
+    devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPath);
   win = new BrowserWindow(browserWinConfig);
   win.loadURL(url);
   if (isDev) win.webContents.openDevTools();
