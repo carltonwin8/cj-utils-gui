@@ -1,6 +1,20 @@
+const path = require("path");
+const os = require("os");
 const { app, BrowserWindow } = require("electron");
+const isDev2 = require("electron-is-dev");
+const isDev = false;
+process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true";
+const url = isDev
+  ? "http://localhost:3210"
+  : `file://${path.join(__dirname, "../build/index.html")}`;
+
+const devToolExtPathMac = path.join(
+  os.homedir(),
+  "/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
+);
 
 let win;
+let devToolExt;
 
 browserWinConfig = {
   width: 800,
@@ -11,12 +25,16 @@ browserWinConfig = {
 };
 
 function createWindow() {
+  devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPathMac);
   win = new BrowserWindow(browserWinConfig);
-  win.loadFile("./build/index.html");
-  win.webContents.openDevTools();
+  win.loadURL(url);
+  if (isDev) win.webContents.openDevTools();
   win.on("closed", () => (win = null));
 }
 
 app.on("ready", createWindow);
-app.on("window-all-closed", () => process.platform !== "darwin" && app.quit());
+app.on("window-all-closed", () => {
+  if (devToolExt) BrowserWindow.removeDevToolsExtension(devToolExt);
+  if (process.platform !== "darwin") app.quit();
+});
 app.on("activate", () => win === null && createWindow());

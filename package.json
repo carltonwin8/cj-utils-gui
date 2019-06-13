@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "electron-is-dev": "^1.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
@@ -15,7 +16,10 @@
     "dist": "yarn build && electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "clean": "rm -rf build dist",
-    "reset": "yarn clean && rm -rf node_modules"
+    "reset": "yarn clean && rm -rf node_modules",
+    "start:3210:nb": "cross-env BROWSER=none PORT=3210 yarn react-scripts start",
+    "e:dev:reload": "nodemon --watch ./public --exec 'electron .'",
+    "dev": "concurrently \"yarn start:3210:nb\" \"wait-on http://localhost:3210 && yarn e:dev:reload\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -37,17 +41,20 @@
     "cross-env": "^5.2.0",
     "electron": "^5.0.3",
     "electron-builder": "^20.43.0",
-    "electron-is-dev": "^1.1.0",
     "nodemon": "^1.19.1",
     "typescript": "^3.5.1",
     "wait-on": "^3.2.0"
   },
-  "main": "./build/electron.js",
+  "main": "./public/electron.js",
   "homepage": "./",
   "build": {
     "appId": "com.carltonjoseph",
     "copyright": "Copyright © 2019 Carlton Joseph",
     "productName": "cj-utils-gui",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
     "mac": {
       "icon": "build/assets/icon.icns",
       "category": "public.app-category.productivity"
