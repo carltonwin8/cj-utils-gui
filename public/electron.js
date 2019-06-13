@@ -28,7 +28,7 @@ switch (process.platform) {
 
 let win;
 let devToolExt;
-
+ 
 browserWinConfig = {
   width: 800,
   height: 600,
@@ -38,7 +38,7 @@ browserWinConfig = {
 };
 
 function createWindow() {
-  if (devToolExtPath)
+  if (isDev && devToolExtPath)
     devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPath);
   win = new BrowserWindow(browserWinConfig);
   win.loadURL(url);
