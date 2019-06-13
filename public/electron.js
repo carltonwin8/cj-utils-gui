@@ -13,6 +13,11 @@ const devToolExtPathMac = path.join(
   "/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
 );
 
+const devToolExtPathWin = path.join(
+  os.homedir(),
+  "C:\Users\carlt\AppData\Local\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi\3.6.0_0"
+);
+
 let win;
 let devToolExt;
 
@@ -25,7 +30,7 @@ browserWinConfig = {
 };
 
 function createWindow() {
-  devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPathMac);
+  devToolExt = BrowserWindow.addDevToolsExtension(devToolExtPathWin);
   win = new BrowserWindow(browserWinConfig);
   win.loadURL(url);
   if (isDev) win.webContents.openDevTools();
