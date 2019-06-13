@@ -16,6 +16,14 @@ Steps Followed:
 - `yarn add -D concurrently cross-env nodemon wait-on`
 - `yarn add electron-is-dev`
 
+### Steps Below For Adding GUI
+
+- `yarn add @material-ui/core`
+
+### Steps Below For Adding Feature
+
+- tbd
+
 ## To Do
 
 - reduce reliance on external non js utilites
