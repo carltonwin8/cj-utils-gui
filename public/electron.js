@@ -14,7 +14,7 @@ const devToolExtPathMac = path.join(
 );
 const devToolExtPathWin = path.join(
   os.homedir(),
-  "C:/Users/carlt/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
+  "/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.6.0_0"
 );
 let devToolExtPath;
 switch (process.platform) {
