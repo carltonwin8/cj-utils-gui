@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.1.0",
+    "cj-photo-process": "0.0.5",
     "electron-is-dev": "^1.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -20,7 +21,8 @@
     "clean": "rm -rf build dist",
     "reset": "yarn clean && rm -rf node_modules",
     "start:3210:nb": "cross-env BROWSER=none PORT=3210 yarn react-scripts start",
-    "e:dev:reload": "nodemon --watch ./public --exec 'electron .'",
+    "e:dev:reload": "nodemon --watch ./public --exec 'electron --inspect=5858 .'",
+    "e:dev:reload:b": "nodemon --watch ./public --exec 'electron --inspect-brk=5858 .'",
     "e:dev:reload:win": "run on cli - npx nodemon --watch ./public --exec 'npx electron .'",
     "dev": "concurrently \"yarn start:3210:nb\" \"wait-on http://localhost:3210 && yarn e:dev:reload\""
   },

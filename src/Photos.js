@@ -12,8 +12,9 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import Grid from "@material-ui/core/Grid";
 
-const debug = true;
+const debug = false;
 
 const useStyles = makeStyles(theme => ({
   formControl: {
@@ -21,7 +22,8 @@ const useStyles = makeStyles(theme => ({
     minWidth: 100
   },
   noNewLine: {
-    display: "inline-block"
+    display: "inline-block",
+    marginLeft: "16px"
   },
   label: {
     display: "inline-block",
@@ -29,12 +31,19 @@ const useStyles = makeStyles(theme => ({
   },
   progress: {
     margin: theme.spacing(2)
+  },
+  grid: {
+    gridTemplateColumns: "1fr",
+    gridAutoFlow: "row"
+  },
+  rightIcon: {
+    marginLeft: theme.spacing(1)
   }
 }));
 
 function Photos() {
   const classes = useStyles();
-  const [path, pathSet] = useState("");
+  const [cwd, cwdSet] = useState("");
   const [error, errorSet] = useState(null);
   const [total, totalSet] = useState(0);
   const [jpegtotal, jpegtotalSet] = useState(0);
@@ -46,8 +55,9 @@ function Photos() {
 
   useEffect(() => {
     window.ipcRenderer.on("photos:set:dir", (_, item) => {
-      if (debug) item = "/Users/carltonjoseph/160_1212";
-      pathSet(item);
+      console.log("p:g:r cwd", item);
+      if (debug) item = "/Users/carltonjoseph/dogs";
+      cwdSet(item);
     });
     window.ipcRenderer.on("photos:error", (_, error) => {
       errorSet(error);
@@ -71,13 +81,13 @@ function Photos() {
   }, []);
 
   const onSelectDirectory = e => window.ipcRenderer.send("photos:get:dir");
-  const onReset = e => window.ipcRenderer.send("photos:reset", path);
+  const onReset = e => window.ipcRenderer.send("photos:reset", cwd);
   const onProcessPhotos = e => {
     totalSet(0);
     extractRawSet(0);
     convertSet(0);
     runningSet(true);
-    window.ipcRenderer.send("photos:process", path, resolution);
+    window.ipcRenderer.send("photos:process", cwd, resolution);
   };
   const onClearError = e => errorSet(null);
 
@@ -87,67 +97,80 @@ function Photos() {
         <Typography gutterBottom variant="h4" component="h2">
           Photo Processing
         </Typography>
-        <div>
-          <Typography className={classes.label} variant="h6" component="h6">
-            Selected Directory:
-          </Typography>
-          <Typography
-            className={classes.noNewLine}
-            color="secondary"
-            component="span"
-          >
-            {path}
-          </Typography>
-        </div>
-        {error ? (
-          <Typography color="secondary" variant="h6" component="h6">
-            {error}
-          </Typography>
-        ) : null}
-        {total ? (
-          <Typography color="primary">
-            RAW Extracted: {extractRaw} / {total}, resized: {convert} / {total}
-          </Typography>
-        ) : null}
-        {jpegtotal ? (
-          <Typography color="primary">
-            JPEG resized: {jpeg} / {jpegtotal}
-          </Typography>
-        ) : null}
-        {running ? <CircularProgress className={classes.progress} /> : null}
       </CardContent>
       <CardActions>
-        <Button size="small" color="primary" onClick={onSelectDirectory}>
-          Change Selected Directory
-        </Button>
-        <Button size="small" color="primary" onClick={onProcessPhotos}>
-          Process Photos
-        </Button>
-        {error && (
-          <Button size="small" color="secondary" onClick={onClearError}>
-            Clear Error
-          </Button>
-        )}
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="resolution">Resolution</InputLabel>
-          <Select
-            value={resolution}
-            onChange={e =>
-              console.log(e.target) || resolutionSet(e.target.value)
-            }
-            input={<Input name="resolution" id="resolution" />}
-            autoWidth
-          >
-            <MenuItem value="1024x768">1024x768</MenuItem>
-            <MenuItem value="1620x1080">1620x1080</MenuItem>
-            <MenuItem value="1920x1280">1920x1280</MenuItem>
-          </Select>
-        </FormControl>
-        {debug ? (
-          <Button size="small" color="primary" onClick={onReset}>
-            Reset
-          </Button>
-        ) : null}
+        <Grid container className={classes.grid} spacing={1}>
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={onSelectDirectory}
+            >
+              Change Selected Directory
+            </Button>
+            <Typography
+              className={classes.noNewLine}
+              color="secondary"
+              component="span"
+            >
+              {cwd}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={onProcessPhotos}
+            >
+              Process Photos
+            </Button>
+            {debug ? (
+              <Button size="small" color="secondary" onClick={onReset}>
+                Reset
+              </Button>
+            ) : null}
+          </Grid>
+          <Grid item>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="resolution">Resolution</InputLabel>
+              <Select
+                value={resolution}
+                onChange={e =>
+                  console.log(e.target) || resolutionSet(e.target.value)
+                }
+                input={<Input name="resolution" id="resolution" />}
+                autoWidth
+              >
+                <MenuItem value="1024x768">1024x768</MenuItem>
+                <MenuItem value="1620x1080">1620x1080</MenuItem>
+                <MenuItem value="1920x1280">1920x1280</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          {error ? (
+            <Typography color="secondary" variant="h6" component="h6">
+              {error}
+            </Typography>
+          ) : null}
+          {total ? (
+            <Typography color="primary">
+              RAW Extracted: {extractRaw} / {total}, resized: {convert} /{" "}
+              {total}
+            </Typography>
+          ) : null}
+          {jpegtotal ? (
+            <Typography color="primary">
+              JPEG resized: {jpeg} / {jpegtotal}
+            </Typography>
+          ) : null}
+          {running ? <CircularProgress className={classes.progress} /> : null}
+
+          {error && (
+            <Button size="small" color="secondary" onClick={onClearError}>
+              Clear Error
+            </Button>
+          )}
+        </Grid>
       </CardActions>
     </Card>
   );
