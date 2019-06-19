@@ -30,6 +30,7 @@ const useStyles = makeStyles(theme => ({
     marginRight: "10px"
   },
   progress: {
+    display: "inline-bock",
     margin: theme.spacing(2)
   },
   grid: {
@@ -38,10 +39,14 @@ const useStyles = makeStyles(theme => ({
   },
   rightIcon: {
     marginLeft: theme.spacing(1)
+  },
+  resetBtn: {
+    marginLeft: theme.spacing(1)
   }
 }));
 
 function Photos() {
+  const { ipcRenderer } = window;
   const classes = useStyles();
   const [cwd, cwdSet] = useState("");
   const [error, errorSet] = useState(null);
@@ -54,42 +59,33 @@ function Photos() {
   const [running, runningSet] = useState(false);
 
   useEffect(() => {
-    window.ipcRenderer.on("photos:set:dir", (_, item) => {
-      console.log("p:g:r cwd", item);
-      if (debug) item = "/Users/carltonjoseph/dogs";
-      cwdSet(item);
-    });
-    window.ipcRenderer.on("photos:error", (_, error) => {
-      errorSet(error);
+    const { ipcRenderer } = window;
+    ipcRenderer.on("photos:set:dir", (_, item) => cwdSet(item));
+    ipcRenderer.on("photos:error", (_, err) => {
+      errorSet(err);
       runningSet(false);
     });
-    window.ipcRenderer.on("photos:status:total", (_, total) => totalSet(total));
-    window.ipcRenderer.on("photos:status:extractRaw", (_, extractRaw) =>
-      extractRawSet(extractRaw)
-    );
-    window.ipcRenderer.on("photos:status:convert", (_, convert) =>
-      convertSet(state => state + convert)
-    );
-    window.ipcRenderer.on("photos:status:jpeg", (_, jpeg) =>
-      jpegSet(state => state + jpeg)
-    );
-    window.ipcRenderer.on("photos:status:jpegtotal", (_, jpegtotal) =>
-      jpegtotalSet(jpegtotal)
-    );
-    window.ipcRenderer.on("photos:status:finished", () => runningSet(false));
-    window.ipcRenderer.send("photos:gui:ready");
+    ipcRenderer.on("photos:status:total", (_, ttl) => totalSet(ttl));
+    ipcRenderer.on("photos:status:extractRaw", (_, er) => extractRawSet(er));
+    ipcRenderer.on("photos:status:convert", (_, c) => convertSet(p => p + c));
+    ipcRenderer.on("photos:status:jpeg", (_, j) => jpegSet(p => p + j));
+    ipcRenderer.on("photos:status:jpegtotal", (_, jt) => jpegtotalSet(jt));
+    ipcRenderer.on("photos:status:finished", () => runningSet(false));
+    ipcRenderer.send("photos:gui:ready");
   }, []);
 
-  const onSelectDirectory = e => window.ipcRenderer.send("photos:get:dir");
-  const onReset = e => window.ipcRenderer.send("photos:reset", cwd);
-  const onProcessPhotos = e => {
-    totalSet(0);
+  const reset = (rning, clrTotal = true) => {
+    if (clrTotal) totalSet(0);
     extractRawSet(0);
     convertSet(0);
-    runningSet(true);
-    window.ipcRenderer.send("photos:process", cwd, resolution);
+    runningSet(rning);
+    return true;
   };
-  const onClearError = e => errorSet(null);
+  const onSelectDirectory = _ => ipcRenderer.send("photos:get:dir");
+  const onReset = _ => reset(false) && ipcRenderer.send("photos:reset", cwd);
+  const onProcess = _ =>
+    reset(true, false) && ipcRenderer.send("photos:process", cwd, resolution);
+  const onClearError = _ => errorSet(null);
 
   return (
     <Card>
@@ -117,20 +113,21 @@ function Photos() {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={onProcessPhotos}
-            >
+            <Button variant="contained" color="primary" onClick={onProcess}>
               Process Photos
             </Button>
             {debug ? (
-              <Button size="small" color="secondary" onClick={onReset}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={onReset}
+                className={classes.resetBtn}
+              >
                 Reset
               </Button>
             ) : null}
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="resolution">Resolution</InputLabel>
               <Select
@@ -146,30 +143,33 @@ function Photos() {
                 <MenuItem value="1920x1280">1920x1280</MenuItem>
               </Select>
             </FormControl>
+            {running ? <CircularProgress className={classes.progress} /> : null}
           </Grid>
-          {error ? (
-            <Typography color="secondary" variant="h6" component="h6">
-              {error}
-            </Typography>
-          ) : null}
-          {total ? (
-            <Typography color="primary">
-              RAW Extracted: {extractRaw} / {total}, resized: {convert} /{" "}
-              {total}
-            </Typography>
-          ) : null}
-          {jpegtotal ? (
-            <Typography color="primary">
-              JPEG resized: {jpeg} / {jpegtotal}
-            </Typography>
-          ) : null}
-          {running ? <CircularProgress className={classes.progress} /> : null}
-
-          {error && (
-            <Button size="small" color="secondary" onClick={onClearError}>
-              Clear Error
-            </Button>
-          )}
+          <Grid item xs={12}>
+            {jpegtotal ? (
+              <Typography color="primary">
+                JPEG resized: {jpeg} / {jpegtotal}
+              </Typography>
+            ) : null}
+            {total ? (
+              <Typography color="primary">
+                RAW Extracted: {extractRaw} / {total}, resized: {convert} /{" "}
+                {total}
+              </Typography>
+            ) : null}
+          </Grid>
+          <Grid item>
+            {error ? (
+              <Typography color="secondary" variant="h6" component="h6">
+                {error}
+              </Typography>
+            ) : null}
+            {error && (
+              <Button size="small" color="secondary" onClick={onClearError}>
+                Clear Error
+              </Button>
+            )}
+          </Grid>
         </Grid>
       </CardActions>
     </Card>
