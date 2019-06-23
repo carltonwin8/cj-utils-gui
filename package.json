@@ -1,7 +1,7 @@
 {
   "name": "cj-utils-gui",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@material-ui/core": "^4.1.0",
     "cj-photo-process": "0.0.6",
