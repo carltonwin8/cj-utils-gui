@@ -1,5 +1,15 @@
 # Carlton's Utilites GUI
 
+In order to run the image organization software install:
+
+- imagemagick convert
+- dcraw
+
+For windows dcraw can be found at
+http://www.centrostudiprogressofotografico.it/en/dcraw/
+and the exe should be rename to dcraw and moved to the following directory.
+C:/"Program Files"/ImageMagick-7.0.8-Q16/
+
 ## Minimum Create React Application With Electron
 
 Steps Followed:
